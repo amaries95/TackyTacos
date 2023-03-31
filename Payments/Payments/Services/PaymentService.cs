@@ -4,7 +4,7 @@ namespace Payments.Services;
 internal class PaymentService
 {
     private readonly HttpClient _httpClient;
-    internal PaymentService(HttpClient client)
+    public PaymentService(HttpClient client)
     {
         _httpClient = client ?? throw new ArgumentNullException(nameof(client));
     }

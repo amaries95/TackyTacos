@@ -11,3 +11,14 @@ services:
       - "1433:1433"
     volumes:
       - C:\Users\Layla\DockerVolumes\sqlserver:/var/opt/mssql/data
+  mongodb:
+    image : mongo
+    container_name: mongodb
+    environment:  
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+    volumes:
+      - C:\Users\Layla\DockerVolumes\mongo:/var/opt/mongo/data
