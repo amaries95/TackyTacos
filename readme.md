@@ -117,6 +117,7 @@ public static class PaymentsServiceCollection
 Then register it in the `Program.cs` file in the *Web* project.
 
 ```csharp
+builder.Services.AddHttpClient();
 builder.Services.AddPayments();
 ```
 
