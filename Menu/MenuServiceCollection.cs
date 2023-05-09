@@ -10,7 +10,7 @@ namespace Menu
     {
         public static IServiceCollection AddMenu(this IServiceCollection services, IConfiguration config)
         {
-            services.AddDbContext<TackyTacosDbContext>(options => options.UseSqlServer(config.GetConnectionString("TackTacos")));
+            services.AddDbContext<TackyTacosDbContext>(options => options.UseSqlServer(config.GetConnectionString("TackyTacos")));
             services.AddScoped<MenuRepository>();
             services.AddScoped<MenuService>();
 

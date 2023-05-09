@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace Payments.Models;

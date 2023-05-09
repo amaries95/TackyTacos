@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Payments.Models;
 using System.Net;
 using Microsoft.Azure.Cosmos.Table;
