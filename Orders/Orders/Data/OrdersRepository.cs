@@ -1,5 +1,5 @@
 ﻿
-using TackyTacos.Orders.Models;
+using Orders.Entities;
 
 namespace TackyTacos.Orders.Data;
 internal class OrdersRepository

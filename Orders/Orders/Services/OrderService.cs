@@ -1,26 +1,34 @@
-﻿using TackyTacos.Orders.Models;
+﻿using Orders.Contracts.Dtos;
+using Orders.Data;
+using Orders.Entities;
 
 namespace TackyTacos.Orders.Services;
 
 internal class OrderService
 {
-    internal async Task<IEnumerable<Order>> GetAllOrdersAsync()
+    private readonly OrdersDbContext _dbcontext;
+    public OrderService(OrdersDbContext dbcontext)
     {
-        throw new NotImplementedException();
+        _dbcontext = dbcontext;
+
     }
 
-    internal async Task<Order> GetOrderByOrderIdAsync()
+    internal List<OrderDto> GetAllOrders()
     {
-        throw new NotImplementedException();
+        return _dbcontext.Orders.Select(ord => new OrderDto().MapOrder(ord)).ToList();
     }
 
-    internal async Task CreateOrderAsync(Order order)
-	{
-        throw new NotImplementedException();
+    internal OrderDto GetOrderByOrderId(Guid id)
+    {
+        return new OrderDto().MapOrder(_dbcontext.GetById(id));
     }
 
-    internal async Task UpdateOrderPaymentStatusAsync(Order order)
-	{
+    internal bool CreateOrder(OrderDto order)
+    {
+        return _dbcontext.Create(new Order().MapOrderDto(order));
+    }
+    internal void UpdateOrderPaymentStatus(OrderDto order)
+    {
         throw new NotImplementedException();
     }
 }

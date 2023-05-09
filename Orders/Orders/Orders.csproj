@@ -8,6 +8,15 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
+	<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
   </ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Orders.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Orders.Contracts\Orders.Contracts.csproj" />
+	</ItemGroup>
 
 </Project>
