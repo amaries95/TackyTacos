@@ -48,6 +48,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kitchen.Contracts", "Kitche
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KItchenLib", "KItchenLib\KItchenLib.csproj", "{D2363E4A-3102-42E9-BC9A-3CCE5CEEF4A0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messaging", "Messaging", "{D097DADE-D82A-4505-9D7D-6840ED8EC090}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.Contracts", "Messaging.Contracts\Messaging.Contracts.csproj", "{E30D8C7A-FC26-431E-9200-75DA0D3BB6C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +110,10 @@ Global
 		{D2363E4A-3102-42E9-BC9A-3CCE5CEEF4A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2363E4A-3102-42E9-BC9A-3CCE5CEEF4A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2363E4A-3102-42E9-BC9A-3CCE5CEEF4A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E30D8C7A-FC26-431E-9200-75DA0D3BB6C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E30D8C7A-FC26-431E-9200-75DA0D3BB6C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E30D8C7A-FC26-431E-9200-75DA0D3BB6C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E30D8C7A-FC26-431E-9200-75DA0D3BB6C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,6 +132,7 @@ Global
 		{70E25BAE-71A4-4541-9857-8D4FB697C04C} = {DB02C2E5-BE2B-49EA-ADB5-10E6A642F2C2}
 		{CA7CD51C-AE30-4EF7-9135-57071C7A193B} = {39266E34-99D4-4993-8D1F-D6FBF9EED209}
 		{D2363E4A-3102-42E9-BC9A-3CCE5CEEF4A0} = {39266E34-99D4-4993-8D1F-D6FBF9EED209}
+		{E30D8C7A-FC26-431E-9200-75DA0D3BB6C0} = {D097DADE-D82A-4505-9D7D-6840ED8EC090}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {861391AF-2828-474F-A49E-1E0A1AD827AA}

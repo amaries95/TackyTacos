@@ -9,12 +9,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\KItchenLib\KItchenLib.csproj" />
     <ProjectReference Include="..\..\Menu\Menu\Menu.csproj" />
+    <ProjectReference Include="..\..\Messaging.Contracts\Messaging.Contracts.csproj" />
     <ProjectReference Include="..\..\Orders\Orders\Orders\Orders.csproj" />
     <ProjectReference Include="..\..\Payments\Payments\Payments.csproj" />
   </ItemGroup>
