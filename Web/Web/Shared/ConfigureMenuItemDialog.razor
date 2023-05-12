@@ -1,0 +1,83 @@
+﻿@using Menu.Contracts.Dtos;
+@using Orders.Contracts.Dtos;
+@using System.Net.Http
+
+<div class="dialog-container">
+    <div class="dialog">
+        <div class="dialog-title">
+            <h2>@OrderItem.Name</h2>
+             </div>
+        <form class="dialog-body">
+
+                <div class="form-group">
+                @foreach (var mod in ItemToBeConfigured.MenuModifications)
+                    {
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="@mod.Id" @onchange="@((ChangeEventArgs e) => CheckboxClicked(@mod, e.Value))">
+                        <label class="custom-control-label" for="@mod.Id">@mod.Name - £@mod.Price.ToString("0.00")</label>
+                        </div>
+                    }
+                </div>
+
+        </form>
+        <div class="dialog-buttons">
+            <button class="btn btn-secondary mr-auto" @onclick="OnCancel">Cancel</button>
+            <span class="mr-center">
+                Price: <span class="price">@GetFormattedTotalPrice()</span>
+            </span>
+            <button class="btn btn-success ml-auto" @onclick="OnConfirm">Order ></button>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter] public OrderItemDto OrderItem { get; set; }
+    [Parameter] public MenuItemDto ItemToBeConfigured { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    List<MenuModificationDto> selectedMenuModifications = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    void CheckboxClicked(MenuModificationDto mod, object checkedValue)
+    {
+        if ((bool)checkedValue)
+        {
+
+            if (!selectedMenuModifications.Contains(mod))
+            {
+                selectedMenuModifications.Add(mod);
+                OrderItem.Modifications.Add(new OrderItemDto
+                    {
+                        Id = mod.Id,
+                        Name = mod.Name,
+                        Price = mod.Price
+                    });
+            }
+
+        }
+        else
+        {
+            selectedMenuModifications.Remove(mod);
+            var itemToRemove = OrderItem.Modifications.Single(r => r.Id == mod.Id);
+            OrderItem.Modifications.Remove(itemToRemove);
+
+        }
+
+        StateHasChanged();
+    }
+
+    private decimal GetTotalPrice()
+    {
+        return OrderItem.Price + OrderItem.Modifications.Sum(e => e.Price);
+    }
+
+    private string GetFormattedTotalPrice()
+    {
+        return GetTotalPrice().ToString("0.00");
+    }
+}

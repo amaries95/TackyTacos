@@ -1,0 +1,31 @@
+﻿@using Orders.Contracts.Dtos;
+
+
+<div class="cart-item">
+    <a @onclick="OnRemoved" class="delete-item">x</a>
+    <div class="title">@OrderItem.Name</div>
+    <ul>
+        @foreach (var mod in OrderItem.Modifications)
+        {
+        <li>+ @mod.Name - £@mod.Price.ToString("0.00")</li>
+        }
+    </ul>
+    <div class="item-price">
+        @GetFormattedTotalPrice()
+    </div>
+</div>
+
+@code {
+    [Parameter] public OrderItemDto OrderItem { get; set; }
+    [Parameter] public EventCallback OnRemoved { get; set; }
+
+    private decimal GetTotalPrice()
+    {
+        return OrderItem.Price + OrderItem.Modifications.Sum(e => e.Price);
+    }
+
+    private string GetFormattedTotalPrice()
+    {
+        return GetTotalPrice().ToString("0.00");
+    }
+}

@@ -1,0 +1,111 @@
+﻿@page "/"
+@using Kitchen.Contracts.Dtos;
+@using Kitchen.Contracts;
+@using Microsoft.AspNetCore.SignalR.Client;
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
+
+<PageTitle>Orders</PageTitle>
+
+
+
+<div class="main">
+    <h1>Tacky Taco Orders</h1>
+    <hr />
+    <h3>Current Orders</h3>
+    <div class="card-deck">
+        @foreach (var order in Orders)
+        {
+            <div class="card" >
+                <div class="card-header">
+                    @order.Id <span class="badge badge-info">@order.OrderStatuses.OrderByDescending(t=>t.UpdatedTime).First().Status</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var item in order.OrderItems)
+                    {
+                        var mods = string.Join(", ", item.Modifications.Select(p => p.Name).ToList());
+                        <li class="list-group-item">@item.Name with @mods</li>
+                    }
+                </ul>
+                <div class="card-body">
+                    <button @onclick="async() => await Send(order, KitchenOrderStatus.Processing)" disabled="@(!IsConnected)">Mark Processing</button>
+                    <button @onclick="async() => await Send(order, KitchenOrderStatus.ReadyForCustomerPickup)" disabled="@(!IsConnected)">Mark Complete</button>
+                </div>
+            </div>
+        }
+    </div>
+    <hr />
+    <h3>Completed Orders</h3>
+    <div class="card-deck">
+        @foreach (var order in CompletedOrders)
+        {
+            <div class="card">
+                <div class="card-header">
+                    @order.Id <span class="badge badge-info">@order.OrderStatuses.OrderByDescending(t=>t.UpdatedTime).First().Status</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var item in order.OrderItems)
+                    {
+                        var mods = string.Join(", ", item.Modifications.Select(p => p.Name).ToList());
+                        <li class="list-group-item">@item.Name with @mods</li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>
+
+
+@code {
+    private HubConnection? hubConnection;
+    private List<KitchenOrderDto> Orders = new();
+    private List<KitchenOrderDto> CompletedOrders = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+           .WithUrl("https://localhost:7225/kitchenhub")
+           .Build();
+
+        hubConnection.On<KitchenOrderDto>("OrderReceived", (order) =>
+        {
+            Orders.Add(order);
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    private async Task Send(KitchenOrderDto order, KitchenOrderStatus status)
+    {
+
+        if (hubConnection is not null)
+        {
+            order.OrderStatuses.Add(new()
+                {
+                    Status = status,
+                    UpdatedTime = DateTime.UtcNow
+                });
+
+            if (status == KitchenOrderStatus.ReadyForCustomerPickup)
+            {
+                Orders.Remove(order);
+                CompletedOrders.Add(order);
+            }
+            await hubConnection.SendAsync("UpdateOrder", order);
+        }
+    }
+
+   
+}

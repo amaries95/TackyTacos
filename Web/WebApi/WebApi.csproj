@@ -13,9 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Menu\Menu.csproj" />
-    <ProjectReference Include="..\Orders\Orders\Orders.csproj" />
-    <ProjectReference Include="..\Payments\Payments.csproj" />
+    <ProjectReference Include="..\..\KItchenLib\KItchenLib.csproj" />
+    <ProjectReference Include="..\..\Menu\Menu\Menu.csproj" />
+    <ProjectReference Include="..\..\Orders\Orders\Orders\Orders.csproj" />
+    <ProjectReference Include="..\..\Payments\Payments\Payments.csproj" />
   </ItemGroup>
 
 </Project>

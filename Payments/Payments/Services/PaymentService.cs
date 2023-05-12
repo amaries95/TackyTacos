@@ -1,7 +1,7 @@
-﻿using Payments.Contracts;
-using Payments.Data;
-using Payments.Models;
+﻿using Payments.Data;
+using Payments.Contracts.Models;
 using System.Text.Json;
+using Payments.Models;
 
 namespace Payments.Services;
 internal class PaymentService
@@ -14,7 +14,7 @@ internal class PaymentService
         _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    internal async Task RequestPayment(OrderCheckout orderCheckout)
+    internal async Task RequestPayment(OrderCheckoutDto orderCheckout)
     {
         // make call to flaky API
 

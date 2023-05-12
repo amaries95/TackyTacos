@@ -17,7 +17,7 @@ internal static class OrderEndpoints
             bool isSuccess = orderService.CreateOrder(order);
             if (isSuccess)
             {
-                result = TypedResults.Ok(200);
+                result = TypedResults.Ok(order.Id);
             }
             else
             {

@@ -1,0 +1,150 @@
+﻿@using Orders.Contracts.Dtos;
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using System.Text
+@using System.Net.Mime
+@using Payments.Contracts.Models;
+@inject IHttpClientFactory HttpClientFactory
+
+<nav class="navbar fixed-bottom navbar-light bg-light">
+    <div class="container-fluid">
+        @if (Order.OrderItems.Any())
+        {
+            <div class="basket-contents">
+                <h2>Your basket: </h2>
+
+                @foreach (var configuredItem in Order.OrderItems)
+                {
+                    <ConfiguredOrderItem OrderItem="configuredItem" OnRemoved="@(() => RemoveConfiguredMenuItem(configuredItem))" />
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-cart">Choose a taco<br>to get started</div>
+        }
+
+
+        <form class="basket-total @(Order.OrderItems.Any() ? "" : "hidden")">
+            <div class="form-group">
+                <label for="@Order.CustomerName">Full Name</label>
+                <input type="text" @bind="@Order.CustomerName" class="form-control" id="customerName" aria-describedby="customerNameHelp" placeholder="Enter full name">
+                <small id="customerNameHelp" class="form-text text-muted">We need your full name when you collect your order.</small>
+            </div>
+            <div class="form-group">
+                <label for="@Order.CustomerEmail">Email Address</label>
+                <input type="email" @bind="@Order.CustomerEmail" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email address">
+                <small id="emailHelp" class="form-text text-muted">We need your email to send your confirmation and receipt. We'll never share your email with anyone else.</small>
+            </div>
+            Total:
+            <span class="total-price">@GetFormattedTotalPrice(Order.OrderItems)</span>
+            <button class="btn btn-warning" @onclick:preventDefault="true" disabled="@(Order.OrderItems.Count == 0 && string.IsNullOrEmpty(Order.CustomerName) && string.IsNullOrEmpty(Order.CustomerEmail))" @onclick="PlaceOrder">
+                Order >
+            </button>
+        </form>
+    </div>
+</nav>
+
+
+@code {
+    [Parameter] public OrderDto Order { get; set; }
+
+    void RemoveConfiguredMenuItem(OrderItemDto item)
+    {
+        Order.OrderItems.Remove(item);
+    }
+
+    async Task PlaceOrder()
+    {
+        Console.WriteLine("Placing order");
+        try
+        {
+            Console.WriteLine(Order.TotalPrice.ToString());
+            var orderClient = HttpClientFactory.CreateClient("OrderService");
+            Order.TotalPrice = GetTotalPrice(Order.OrderItems);
+            Order.OrderStatuses = new List<OrderStatusUpdateDto>()
+            {
+                new OrderStatusUpdateDto
+                {
+                    Status = Orders.Contracts.OrderStatus.Received,
+                    UpdatedTime = DateTime.UtcNow
+                }
+            };
+
+            var orderString = JsonSerializer.Serialize(Order);
+            var content = new StringContent(orderString, Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            var response = await orderClient.PostAsync("", content);
+            Console.WriteLine($"Order placed");
+            if (response.IsSuccessStatusCode)
+            {
+                string idString = await response.Content.ReadAsStringAsync();
+                var trimmedIdString = idString.Substring(1, idString.Length - 2); ;
+                var isGuid = Guid.TryParse(trimmedIdString, out var id);
+
+                if (isGuid)
+                {
+                    await RequestPayment(id);
+                    Console.WriteLine($"Order placed {idString}");
+                    Order = new();
+                    StateHasChanged();
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+    }
+
+    private decimal GetTotalItemPrice(OrderItemDto item)
+    {
+        return item.Price + item.Modifications.Sum(e => e.Price);
+    }
+
+    private decimal GetTotalPrice(List<OrderItemDto> items)
+    {
+        decimal total = 0M;
+        foreach (var item in items)
+        {
+            total += GetTotalItemPrice(item);
+        }
+        return total;
+    }
+
+    private string GetFormattedTotalPrice(List<OrderItemDto> items)
+    {
+        return GetTotalPrice(items).ToString("0.00");
+    }
+
+    private async Task RequestPayment(Guid orderId)
+    {
+        var paymentClient = HttpClientFactory.CreateClient("PaymentService");
+
+        // dummy checkout data
+        var paymentRequest = new OrderCheckoutDto()
+            {
+                Id = orderId,
+                TotalAmount = 12.99M,
+                FirstName = "Test",
+                LastName = "Name",
+                Email = "tast@test.com",
+                Address = "1 street",
+                PostCode = "1234fgr",
+                City = "City",
+                Country = "Country",
+                CardNumber = "123345682552",
+                CardName = "Test Name",
+                CardExpiration = "02/07",
+                CvvCode = "123",
+            };
+
+        var paymentString = JsonSerializer.Serialize(paymentRequest);
+        var content = new StringContent(paymentString, Encoding.UTF8, MediaTypeNames.Application.Json);
+
+        var response = await paymentClient.PostAsync("", content);
+    }
+
+}

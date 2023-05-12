@@ -1,0 +1,92 @@
+﻿@page "/"
+@using Menu.Contracts.Dtos;
+@using System.Net.Http
+@using Orders.Contracts.Dtos;
+@inject IHttpClientFactory HttpClientFactory
+
+@if (menuItems is null)
+{
+    <p>loading....</p>
+}
+else
+{
+    <div class="main">
+
+        <div class="card-deck card-deck-special">
+            @foreach (var taco in tacos)
+            {
+                <div class="card card-special" @onclick="@(() => ShowConfigureMenuItemDialog(taco))">
+                    <div class="card-body">
+                        <h5 class="card-title">@taco.Name</h5>
+                        <p class="card-text">@taco.Description</p>
+                        <span class="price">£@taco.Price.ToString("0.00")</span>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+
+    <ShoppingBasket Order="order" />
+}
+
+@if (showingConfigureDialog)
+{
+    <ConfigureMenuItemDialog OrderItem="configuringOrderItem"
+                         ItemToBeConfigured="itemToBeConfigured"
+                         OnCancel="CancelConfigureMenuItemDialog"
+                         OnConfirm="ConfirmConfigureMenuItemDialog" />
+}
+
+@code {
+    OrderDto order = new();
+    List<MenuItemDto> menuItems;
+    List<MenuItemDto> tacos;
+    List<MenuItemDto> drinks;
+    List<MenuItemDto> sides;
+    OrderItemDto configuringOrderItem;
+    MenuItemDto itemToBeConfigured;
+    bool showingConfigureDialog;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var client = HttpClientFactory.CreateClient("FoodService");
+        menuItems = await client.GetFromJsonAsync<List<MenuItemDto>>("");
+
+        tacos = menuItems.Where(item => item.Category == "Tacos").ToList();
+        drinks = menuItems.Where(item => item.Category == "Drinks").ToList();
+        sides = menuItems.Where(item => item.Category == "Sides").ToList();
+    }
+
+    void ShowConfigureMenuItemDialog(MenuItemDto item)
+    {
+        configuringOrderItem = new OrderItemDto()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Price = item.Price,
+                Modifications = new()
+            };
+        itemToBeConfigured = item;
+        showingConfigureDialog = true;
+    }
+
+    void CancelConfigureMenuItemDialog()
+    {
+        configuringOrderItem = null;
+        itemToBeConfigured = null;
+        showingConfigureDialog = false;
+    }
+
+    void ConfirmConfigureMenuItemDialog()
+    {
+        order.OrderItems.Add(configuringOrderItem);
+        configuringOrderItem = null;
+        itemToBeConfigured = null;
+        showingConfigureDialog = false;
+    }
+
+
+}

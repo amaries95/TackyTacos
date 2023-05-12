@@ -1,6 +1,6 @@
-﻿namespace Payments.Contracts;
+﻿namespace Payments.Contracts.Models;
 
-public class OrderCheckout
+public class OrderCheckoutDto
 {
     public Guid Id { get; set; }
     public decimal TotalAmount { get; set; }
