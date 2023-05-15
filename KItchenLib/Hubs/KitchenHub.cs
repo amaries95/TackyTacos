@@ -1,6 +1,6 @@
-﻿using Kitchen.Contracts.Dtos;
-using KItchenLib.Services;
+﻿using KItchenLib.Services;
 using Microsoft.AspNetCore.SignalR;
+using Orders.Contracts.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,14 +19,14 @@ internal class KitchenHub : Hub
         _listener = listener;
         _context = context;
     }
-    public async Task UpdateOrder(KitchenOrderDto order)
+    public async Task UpdateOrder(OrderDto order)
     {
         
         _listener.OrderUpdated(order);
     }
 
-    public async Task SendMessage(KitchenOrderDto order)
+    public async Task OrderPlaced(OrderDto orderDto)
     {
-        await _context.Clients.All.SendAsync("OrderReceived", order);
+        await _context.Clients.All.SendAsync("OrderReceived", orderDto);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Kitchen.Contracts.Dtos;
+﻿using Orders.Contracts.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace KItchenLib.Services;
 
 internal class KitchenListener
 {
-    internal void OrderUpdated(KitchenOrderDto order)
+    internal void OrderUpdated(OrderDto order)
     {
         Console.WriteLine($"Order: {order.Id} updated");
     }

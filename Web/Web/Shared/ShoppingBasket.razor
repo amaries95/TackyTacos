@@ -1,4 +1,5 @@
-﻿@using Orders.Contracts.Dtos;
+﻿@using Microsoft.AspNetCore.SignalR.Client;
+@using Orders.Contracts.Dtos;
 @using System.Text.Json
 @using System.Text.Json.Serialization
 @using System.Text
@@ -49,6 +50,17 @@
 @code {
     [Parameter] public OrderDto Order { get; set; }
 
+    private HubConnection hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+           .WithUrl("https://localhost:7225/kitchenhub")
+           .Build();
+
+        await hubConnection.StartAsync();
+    }
+
     void RemoveConfiguredMenuItem(OrderItemDto item)
     {
         Order.OrderItems.Remove(item);
@@ -84,12 +96,19 @@
 
                 if (isGuid)
                 {
-                    await RequestPayment(id);
+                    var result = await RequestPayment(id);
                     Console.WriteLine($"Order placed {idString}");
+
+                    if (hubConnection is not null)
+                    {
+                        await hubConnection.SendAsync("OrderPlaced", Order);
+                    }
+
                     Order = new();
                     StateHasChanged();
-                }
 
+                    
+                }
             }
         }
         catch (Exception ex)
@@ -119,7 +138,7 @@
         return GetTotalPrice(items).ToString("0.00");
     }
 
-    private async Task RequestPayment(Guid orderId)
+    private async Task<HttpResponseMessage> RequestPayment(Guid orderId)
     {
         var paymentClient = HttpClientFactory.CreateClient("PaymentService");
 
@@ -145,6 +164,8 @@
         var content = new StringContent(paymentString, Encoding.UTF8, MediaTypeNames.Application.Json);
 
         var response = await paymentClient.PostAsync("", content);
+
+        return response;
     }
 
 }

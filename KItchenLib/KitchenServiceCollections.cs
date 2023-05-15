@@ -26,7 +26,7 @@ namespace KItchenLib
             });
 
             services.AddSingleton<KitchenHub>();
-            services.AddTransient<KitchenService>();
+            services.AddTransient<KitchenSender>();
             services.AddTransient<KitchenListener>();
 
             return services;
