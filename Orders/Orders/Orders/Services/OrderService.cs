@@ -1,4 +1,6 @@
-﻿using Orders.Contracts.Dtos;
+﻿using Kitchen.Contracts.Dtos;
+using Messaging.Contracts;
+using Orders.Contracts.Dtos;
 using Orders.Data;
 using Orders.Entities;
 
@@ -7,10 +9,11 @@ namespace TackyTacos.Orders.Services;
 internal class OrderService
 {
     private readonly OrdersDbContext _dbcontext;
-    public OrderService(OrdersDbContext dbcontext)
+    private readonly IRabbitSender _rabbitSender;
+    public OrderService(OrdersDbContext dbcontext, IRabbitSender rabbitSender)
     {
         _dbcontext = dbcontext;
-
+        _rabbitSender = rabbitSender;
     }
 
     internal List<OrderDto> GetAllOrders()
@@ -23,12 +26,19 @@ internal class OrderService
         return new OrderDto().MapOrder(_dbcontext.GetById(id));
     }
 
-    internal bool CreateOrder(OrderDto order)
+    internal Guid CreateOrder(OrderDto order)
     {
         return _dbcontext.Create(new Order().MapOrderDto(order));
     }
     internal void UpdateOrderPaymentStatus(OrderDto order)
     {
         throw new NotImplementedException();
+    }
+
+    internal void GetOrderDetailsOrderId(Guid id)
+    {
+        var order = GetOrderByOrderId(id);
+        var kitchenOrder = new KitchenOrderDto().MapOrderDto(order);
+        _rabbitSender.PublishMessage(kitchenOrder, RoutingKeys.OrderDetailsResponse);
     }
 }

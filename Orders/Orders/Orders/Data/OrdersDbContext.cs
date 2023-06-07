@@ -37,22 +37,21 @@ internal class OrdersDbContext
         return order;
     }
 
-    internal bool Create(Order order)
+    internal Guid Create(Order order)
     {
-        bool IsSuccessful = false;
+        order.Id = Guid.NewGuid();
 
         try
         {
             _ordersCollection.InsertOne(order);
             _logger.LogInformation("Record inserted");
-            IsSuccessful = true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
         }
 
-        return IsSuccessful;
+        return order.Id;
     }
 
     internal bool Update(Order updatedOrder)

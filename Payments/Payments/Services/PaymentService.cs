@@ -2,16 +2,22 @@
 using Payments.Contracts.Models;
 using System.Text.Json;
 using Payments.Models;
+using Messaging.Contracts;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Payments.Services;
 internal class PaymentService
 {
     private readonly HttpClient _httpClient;
     private readonly TableDbContext _context;
-    internal PaymentService(HttpClient client, TableDbContext dbContext)
+    private readonly IRabbitSender _rabbitSender;
+
+    public PaymentService(HttpClient client, TableDbContext dbContext, IRabbitSender rabbitSender)
     {
         _httpClient = client ?? throw new ArgumentNullException(nameof(client));
         _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        _rabbitSender = rabbitSender ?? throw new ArgumentNullException(nameof(rabbitSender));
     }
 
     internal async Task RequestPayment(OrderCheckoutDto orderCheckout)
@@ -19,17 +25,17 @@ internal class PaymentService
         // make call to flaky API
 
         _httpClient.BaseAddress = new Uri("https://localhost:5091");
-        string json = JsonSerializer.Serialize(orderCheckout);
+        string json = JsonConvert.SerializeObject(orderCheckout);
         StringContent httpContent = new(json, System.Text.Encoding.UTF8, "application/json");
         HttpResponseMessage resp = await _httpClient.PostAsync("/payme", httpContent);
-        string content = await resp.Content.ReadAsStringAsync();
 
-        PaymentResponse paymentResponse = JsonSerializer.Deserialize<PaymentResponse>(content);
-        var paymentResult = await CreatePaymentRecord(paymentResponse);
+        if (resp.IsSuccessStatusCode)
+        {
+            var content = await resp.Content.ReadAsStringAsync();
+            PaymentResponse paymentResponse = JsonConvert.DeserializeObject<PaymentResponse>(content);
 
-
-        // update order status
-
+            _rabbitSender.PublishMessage(paymentResponse, RoutingKeys.OrderUpdatePaid);
+        }
     }
 
     internal async Task<Payment> CreatePaymentRecord(PaymentResponse response)

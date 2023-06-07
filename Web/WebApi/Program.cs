@@ -1,7 +1,9 @@
 using KItchenLib;
+using KItchenLib.Messaging;
 using Menu;
 using Orders;
 using Payments;
+using WebApi.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +32,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOrders(builder.Configuration);
 builder.Services.AddHttpClient();
 builder.Services.AddPayments(builder.Configuration);
+builder.Services.AddKitchenMessaging();
+builder.Services.AddOrderMessaging();
 builder.Services.AddMenu(builder.Configuration);
 builder.Services.AddKitchen(builder.Configuration);
+builder.Services.AddHostedService<WorkerService>();
+builder.Services.RegisterRabbit(builder.Configuration);
 
 var app = builder.Build();
 
@@ -45,6 +51,7 @@ app.UseHttpsRedirection();
 
 app.AddMenuEndpoints();
 app.AddOrderEndpoints();
+app.AddPaymentEndpoints();
 app.AddKitchenApp();
 
 app.UseRouting();

@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
 	<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
@@ -17,6 +18,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Kitchen\Kitchen.Contracts\Kitchen.Contracts.csproj" />
+	  <ProjectReference Include="..\..\..\Messaging.Contracts\Messaging.Contracts.csproj" />
+	  <ProjectReference Include="..\..\..\Payments\Payments\Payments.csproj" />
 	  <ProjectReference Include="..\..\Orders.Contracts\Orders.Contracts.csproj" />
 	</ItemGroup>
 

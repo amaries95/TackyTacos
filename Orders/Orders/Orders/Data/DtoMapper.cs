@@ -1,4 +1,6 @@
-﻿using Orders.Contracts.Dtos;
+﻿using Kitchen.Contracts;
+using Kitchen.Contracts.Dtos;
+using Orders.Contracts.Dtos;
 using Orders.Entities;
 using Orders.Models;
 
@@ -62,5 +64,32 @@ internal static class DtoMapper
         entity.Modifications = dto.Modifications.Count() == 0 ? new()
                             : dto.Modifications.Select(m => new OrderItem().MapOrderItemDto(m)).ToList();
         return entity;
+    }
+
+    internal static KitchenOrderDto MapOrderDto(this KitchenOrderDto dto, OrderDto entity)
+    {
+        dto.Id = entity.Id;
+        dto.OrderStatuses = entity.OrderStatuses.Select(m => new KitchenOrderStatusUpdateDto().MapOrderStatusUpdate(m)).ToList();
+        dto.OrderItems = entity.OrderItems.Select(m => new KitchenOrderItemDto().MapOrderItem(m)).ToList();
+
+        return dto;
+    }
+
+    internal static KitchenOrderStatusUpdateDto MapOrderStatusUpdate(this KitchenOrderStatusUpdateDto dto, OrderStatusUpdateDto entity)
+    {
+        if (Enum.TryParse<KitchenOrderStatus>(entity.Status.ToString(), out var status))
+        {
+            dto.Status = status;
+            dto.UpdatedTime = entity.UpdatedTime;
+        }
+
+        return dto;
+    }
+    internal static KitchenOrderItemDto MapOrderItem(this KitchenOrderItemDto dto, OrderItemDto orderItem)
+    {
+        dto.Name = orderItem.Name;
+        dto.Modifications = orderItem.Modifications.Count() == 0 ? new()
+                            : orderItem.Modifications.Select(m => new KitchenOrderItemDto().MapOrderItem(m)).ToList();
+        return dto;
     }
 }

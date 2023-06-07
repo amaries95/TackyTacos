@@ -21,7 +21,6 @@ internal class KitchenHub : Hub
     }
     public async Task UpdateOrder(KitchenOrderDto order)
     {
-        
         _listener.OrderUpdated(order);
     }
 

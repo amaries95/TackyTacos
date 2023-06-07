@@ -1,24 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Payments.Contracts.Models;
 using System;
 
-namespace PaymentGateway.Controllers
+namespace PaymentGateway.Controllers;
+
+[ApiController]
+[Route("payme")]
+public class PayMeController : Controller
 {
-	[ApiController]
-	[Route("payme")]
-	public class PayMeController : Controller
+	[HttpPost]
+	public IActionResult Post([FromBody] OrderCheckoutDto orderCheckout)
 	{
-		[HttpPost]
-		public IActionResult Post([FromBody] PaymentDto payment)
+		var paymentResponse = new PaymentResponse
 		{
-			
-			int num = new Random().Next(1000);
-			if (num > 500)
-			{
-				Console.WriteLine($"Order id:{payment.OrderId} for £{payment.Total} was successful!");
-				return Ok(true);
-			}
-			Console.WriteLine($"Order id:{payment.OrderId} for £{payment.Total} was a failure :-(");
-			return Ok(false);
-		}
+			OrderId = orderCheckout.Id.ToString(),
+			AmountRequested = orderCheckout.TotalAmount,
+			AuthNumber = "Auth-TRUE",
+		};
+
+		return Ok(paymentResponse);
 	}
 }

@@ -1,5 +1,6 @@
-﻿namespace Payments.Models;
-public class PaymentResponse
+﻿namespace PaymentGateway;
+
+internal class PaymentResponse
 {
     public string OrderId { get; set; }
     public string AuthNumber { get; set; } = null;

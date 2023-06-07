@@ -9,11 +9,12 @@ namespace Payments
     {
         public static IServiceCollection AddPayments(this IServiceCollection services, IConfiguration config)
         {
-            var configSection = config.GetSection("MongoDb");
+            var configSection = config.GetSection("StorageSettings");
             var storageSettings = new StorageSettings();
             configSection.Bind(storageSettings);
             services.AddSingleton<StorageSettings>(storageSettings);
             services.AddSingleton<TableDbContext>();
+            //services.AddTransient<PaymentService>();
             services.AddHttpClient<PaymentService>();
             return services;
         }

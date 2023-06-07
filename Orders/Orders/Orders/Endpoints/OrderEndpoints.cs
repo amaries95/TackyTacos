@@ -14,10 +14,10 @@ internal static class OrderEndpoints
         app.MapPost("/order", (OrderService orderService, [FromBody] OrderDto order) =>
         {
             IResult result;
-            bool isSuccess = orderService.CreateOrder(order);
-            if (isSuccess)
+            Guid orderId = orderService.CreateOrder(order);
+            if (orderId != Guid.Empty)
             {
-                result = TypedResults.Ok(order.Id);
+                result = TypedResults.Ok(orderId);
             }
             else
             {
